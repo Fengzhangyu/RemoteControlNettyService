@@ -13,8 +13,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.zeasn.remotecontrol.MainActivity;
 import com.zeasn.remotecontrol.event.EventSendController;
+import com.zeasn.remotecontrol.service.netty.NSDServer;
 import com.zeasn.remotecontrol.utils.MLog;
 
 import java.beans.PropertyChangeEvent;
@@ -49,6 +49,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
         init();
         /** 将service变为前台服务，防止被轻易杀掉(360,猎豹有效)*/
         startForeground(1, new Notification());
+        registerNsdServer();
         super.onCreate();
     }
 
@@ -92,6 +93,107 @@ public class RemoteControlService extends Service implements PropertyChangeListe
         MLog.e("UID>>>>   " + uid);
         watcher.createAppMonitor(uid);
     }
+
+//
+//    /**
+//     * 开启Socket 服务需要开启一个线程处理，等待客户端连接
+//     */
+//    private void initNetty() {
+//
+//        if (!NettyHelper.getInstance().isServerStart()) {
+//            new NettyThread().start();
+//        }
+//
+//    }
+//
+//
+//    class NettyThread extends Thread {
+//        @Override
+//        public void run() {
+//            super.run();
+//
+//            NettyHelper.getInstance().setListener(new NettyListener() {
+//                @Override
+//                public void onMessageResponse(Object msg) {
+//
+//                    Log.i(TAG, "Server received: " + (String) msg);
+//
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//
+//                            tvContent.setText("Server received: " + msg);
+//
+//                            Toast.makeText(MainActivity.this, String.valueOf(msg), LENGTH_SHORT).show();
+//                        }
+//                    });
+//
+//                }
+//
+//                @Override
+//                public void onChannel(Channel channel) {
+//                    //设置通道连接到封装的类中
+//                    NettyHelper.getInstance().setChannel(channel);
+//
+//                    Log.i(TAG, "建立连接 onChannel(): " + "接收(" + channel.toString() + ")");
+//
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            tvNetty.setText("接收:(" + channel.toString() + ")");
+//
+//                        }
+//                    });
+//                }
+//
+//                @Override
+//                public void onStartServer() {
+//                    Log.i(TAG, "Netty Server started 已开启");
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(getApplicationContext(), "Netty Server 已開啟", LENGTH_SHORT).show();
+//                        }
+//                    });
+//
+//                }
+//
+//                @Override
+//                public void onStopServer() {
+//                    Log.i(TAG, "Netty Server started 已开启");
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(getApplicationContext(), "Netty Server 未連接", LENGTH_SHORT).show();
+//
+//                        }
+//                    });
+//                }
+//
+//                @Override
+//                public void onServiceStatusConnectChanged(int statusCode) {
+//
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            if (statusCode == NettyListener.STATUS_CONNECT_SUCCESS) {
+//                                Log.i(TAG, "STATUS_CONNECT_SUCCESS:");
+//                                //标记连接的状态
+//                                vOpenAppGetCode.setSelected(true);
+//                            } else {
+//                                Log.i(TAG, "onServiceStatusConnectChanged:" + statusCode);
+//                                tvNetty.setText("接收:");
+//                                vOpenAppGetCode.setSelected(false);
+//
+//                            }
+//                        }
+//                    });
+//                }
+//            });
+//            //入口 开启Netty Server
+//            NettyHelper.getInstance().start();
+//        }
+//    }
 
 
     /**
