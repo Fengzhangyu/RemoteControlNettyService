@@ -2,6 +2,8 @@ package com.zeasn.remotecontrol.event;
 
 import android.util.Log;
 
+import com.zeasn.remotecontrol.utils.MLog;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -10,7 +12,6 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cn.vtion.remotecontrol.tvserver.vstoresubclient.utils.MLog;
 
 /** 
  * Interface to the Superuser shell on Android devices with some helper functions.<p/><p/> 

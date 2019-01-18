@@ -7,9 +7,9 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-import com.vtion.tv.remotecontrolplugin.mInterface;
+import com.zeasn.remotecontrol.mInterface;
+import com.zeasn.remotecontrol.utils.MLog;
 
-import cn.vtion.remotecontrol.tvserver.vstoresubclient.utils.MLog;
 
 /**
  * 模拟按键插件控制类

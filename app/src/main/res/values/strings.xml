@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">RemoteControlNettyService</string>
+
+    <string name="plugin_win_title">Zeasn遥控小助手</string>
+    <string name="plugin_win_content">为了遥控功能更好用，强烈建议您安装Zeasn遥控小助手</string>
+    <string name="plugin_win_btn_cancel">取消</string>
+    <string name="plugin_win_btn_ok">安装</string>
 </resources>

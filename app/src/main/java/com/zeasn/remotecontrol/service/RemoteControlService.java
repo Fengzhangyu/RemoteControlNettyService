@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.zeasn.remotecontrol.event.EventSendController;
 import com.zeasn.remotecontrol.service.netty.NSDServer;
+import com.zeasn.remotecontrol.utils.Const;
 import com.zeasn.remotecontrol.utils.MLog;
 
 import java.beans.PropertyChangeEvent;
@@ -25,6 +26,10 @@ import java.util.List;
  * Created by Devin.F on 2019/1/15.
  */
 public class RemoteControlService extends Service implements PropertyChangeListener {
+
+    static {
+        System.loadLibrary("RemoteControl");
+    }
 
     private static final String TAG = "RemoteControlService";
 
@@ -51,6 +56,34 @@ public class RemoteControlService extends Service implements PropertyChangeListe
         startForeground(1, new Notification());
         registerNsdServer();
         super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        MLog.d("onStartCommand，intent对象不为空");
+        flags = START_STICKY;
+
+        if (intent == null) {
+            MLog.e("开启RemoteControlService服务时，intent对象为空");
+            return super.onStartCommand(intent, flags, startId);
+        }
+
+        String action = intent.getAction();
+        if (Const.START_REMOTE_CONTROL_ACTION.equals(action)) {
+            if (eventSendController != null) {
+                eventSendController.initEventModel();
+            }
+            /** 初始化DMS service */
+//            initUpnp();
+        }
+//        else if (Const.UPDATE_INJECT_MODEL_ACTION.equals(action)) {
+//            if (eventSendController != null) {
+//                int model = intent.getIntExtra(EventSendController.KEY_INJECT_MODEL, EventSendController.ADB_MODEL);//ADB_MODEL 20150908修改为PLUGIN_MODEL
+//                eventSendController.setInjectModel(model);
+//            }
+//        }
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override

@@ -2,7 +2,8 @@ package com.zeasn.remotecontrol.event;
 
 import android.app.Instrumentation;
 
-import cn.vtion.remotecontrol.tvserver.vstoresubclient.utils.KeyUtil;
+import com.zeasn.remotecontrol.utils.KeyUtil;
+
 
 /**原生签名命令事件*/
 public class PrimarySigEvent extends BaseEvent {

@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.util.Log;
 
+import com.zeasn.remotecontrol.utils.Const;
+
 import java.util.ArrayList;
 
 /**
