@@ -40,7 +40,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<byte[]> {
         while (iterator_2.hasNext()) {
             Object key = iterator_2.next();
             Log.d("NettyService_Test:", new String(mObjects.get(key)));
-            mListener.onMessageResponse(new String(mObjects.get(key)));
+//            mListener.onMessageResponse(new String(mObjects.get(key)));
+            mListener.onMessageResponse("1");
         }
 
 //        String s = tlvBox.getStringValue(13);

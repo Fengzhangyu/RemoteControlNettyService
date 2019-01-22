@@ -15,7 +15,7 @@ static char* jstringTostr(JNIEnv* env, jstring jstr)
 			encode);
 	jsize strLen = env->GetArrayLength(byteArray);
 	jbyte *jBuf = env->GetByteArrayElements(byteArray, JNI_FALSE);
-	if (jBuf > 0)
+	if (jBuf >  (char *)0)
 	{
 		pStr = (char*) malloc(strLen + 1);
 		if (!pStr)
@@ -25,7 +25,7 @@ static char* jstringTostr(JNIEnv* env, jstring jstr)
 		memcpy(pStr, jBuf, strLen);
 		pStr[strLen] = 0;
 	}
-	env->ReleaseByteArrayElements(byteArray, jBuf, 0);
+	env->ReleaseByteArrayElements(byteArray, jBuf,  (char *)0);
 
 	return pStr;
 

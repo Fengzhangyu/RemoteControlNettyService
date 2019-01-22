@@ -29,9 +29,9 @@ public class RemotePlugin extends BaseEvent {
     }
 
     private void init() {
-        Intent intent = new Intent(PLUGIN_ACTION);
+//        Intent intent = new Intent(PLUGIN_ACTION);
 //        intent.setPackage(mContext.getPackageName());
-        mContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+//        mContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {

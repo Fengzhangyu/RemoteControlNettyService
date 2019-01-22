@@ -9,12 +9,18 @@ import android.content.pm.ApplicationInfo;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.media.AudioManager;
 import android.net.nsd.NsdServiceInfo;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.zeasn.remotecontrol.MainActivity;
 import com.zeasn.remotecontrol.event.EventSendController;
+import com.zeasn.remotecontrol.interfaces.NettyListener;
 import com.zeasn.remotecontrol.service.netty.NSDServer;
+import com.zeasn.remotecontrol.service.netty.NettyHelper;
 import com.zeasn.remotecontrol.utils.Const;
 import com.zeasn.remotecontrol.utils.MLog;
 
@@ -22,14 +28,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
+import io.netty.channel.Channel;
+
 /**
  * Created by Devin.F on 2019/1/15.
  */
 public class RemoteControlService extends Service implements PropertyChangeListener {
-
-    static {
-        System.loadLibrary("RemoteControl");
-    }
 
     private static final String TAG = "RemoteControlService";
 
@@ -46,15 +50,19 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
     public static boolean isConnected = false;    //记录tv是否有设备连接
 
-    public Watcher watcher;
+//    public Watcher watcher;
+
+    private Handler handler;
 
     @Override
     public void onCreate() {
         MLog.d("onStartCommand，onCreate");
+        handler = new Handler(Looper.getMainLooper());
         init();
         /** 将service变为前台服务，防止被轻易杀掉(360,猎豹有效)*/
         startForeground(1, new Notification());
         registerNsdServer();
+        initNetty();
         super.onCreate();
     }
 
@@ -111,7 +119,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
         audio = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
 
-        watcher = new Watcher(this);
+//        watcher = new Watcher(this);
         String uid = "";
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         ApplicationInfo appinfo = getApplicationInfo();
@@ -124,52 +132,46 @@ public class RemoteControlService extends Service implements PropertyChangeListe
             }
         }
         MLog.e("UID>>>>   " + uid);
-        watcher.createAppMonitor(uid);
+//        watcher.createAppMonitor(uid);
     }
 
-//
-//    /**
-//     * 开启Socket 服务需要开启一个线程处理，等待客户端连接
-//     */
-//    private void initNetty() {
-//
-//        if (!NettyHelper.getInstance().isServerStart()) {
-//            new NettyThread().start();
-//        }
-//
-//    }
-//
-//
-//    class NettyThread extends Thread {
-//        @Override
-//        public void run() {
-//            super.run();
-//
-//            NettyHelper.getInstance().setListener(new NettyListener() {
-//                @Override
-//                public void onMessageResponse(Object msg) {
-//
-//                    Log.i(TAG, "Server received: " + (String) msg);
-//
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//
-//                            tvContent.setText("Server received: " + msg);
-//
-//                            Toast.makeText(MainActivity.this, String.valueOf(msg), LENGTH_SHORT).show();
-//                        }
-//                    });
-//
-//                }
-//
-//                @Override
-//                public void onChannel(Channel channel) {
-//                    //设置通道连接到封装的类中
-//                    NettyHelper.getInstance().setChannel(channel);
-//
-//                    Log.i(TAG, "建立连接 onChannel(): " + "接收(" + channel.toString() + ")");
-//
+
+    /**
+     * 开启Socket 服务需要开启一个线程处理，等待客户端连接
+     */
+    private void initNetty() {
+
+        if (!NettyHelper.getInstance().isServerStart()) {
+            new NettyThread().start();
+        }
+
+    }
+
+
+    class NettyThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+
+            NettyHelper.getInstance().setListener(new NettyListener() {
+                @Override
+                public void onMessageResponse(Object msg) {
+
+                    Log.i(TAG, "Server==received: " + (String) msg);
+
+                    eventSendController.sendEvent((String) msg);
+
+//                    Toast.makeText(RemoteControlService.this, String.valueOf(msg), Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onChannel(final Channel channel) {
+                    //设置通道连接到封装的类中
+                    NettyHelper.getInstance().setChannel(channel);
+
+                    Log.i(TAG, "建立连接 onChannel(): " + "接收(" + channel.toString() + ")");
+
 //                    runOnUiThread(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -177,36 +179,26 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 //
 //                        }
 //                    });
-//                }
-//
-//                @Override
-//                public void onStartServer() {
-//                    Log.i(TAG, "Netty Server started 已开启");
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Toast.makeText(getApplicationContext(), "Netty Server 已開啟", LENGTH_SHORT).show();
-//                        }
-//                    });
-//
-//                }
-//
-//                @Override
-//                public void onStopServer() {
-//                    Log.i(TAG, "Netty Server started 已开启");
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Toast.makeText(getApplicationContext(), "Netty Server 未連接", LENGTH_SHORT).show();
-//
-//                        }
-//                    });
-//                }
-//
-//                @Override
-//                public void onServiceStatusConnectChanged(int statusCode) {
-//
-//                    runOnUiThread(new Runnable() {
+                }
+
+                @Override
+                public void onStartServer() {
+                    Log.i(TAG, "Netty Server started 已開啟");
+//                    Toast.makeText(RemoteControlService.this, "Netty Server 已開啟", Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onStopServer() {
+                    Log.i(TAG, "Netty Server started 未連接");
+//                    Toast.makeText(RemoteControlService.this, "Netty Server 未連接", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onServiceStatusConnectChanged(final int statusCode) {
+
+                    Log.i(TAG, "Netty Server status:" + statusCode);
+//                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {
 //                            if (statusCode == NettyListener.STATUS_CONNECT_SUCCESS) {
@@ -215,18 +207,19 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 //                                vOpenAppGetCode.setSelected(true);
 //                            } else {
 //                                Log.i(TAG, "onServiceStatusConnectChanged:" + statusCode);
-//                                tvNetty.setText("接收:");
+////                                tvNetty.setText("接收:");
 //                                vOpenAppGetCode.setSelected(false);
 //
 //                            }
 //                        }
 //                    });
-//                }
-//            });
-//            //入口 开启Netty Server
-//            NettyHelper.getInstance().start();
-//        }
-//    }
+
+                }
+            });
+            //入口 开启Netty Server
+            NettyHelper.getInstance().start();
+        }
+    }
 
 
     /**

@@ -14,6 +14,11 @@ import java.util.ArrayList;
  *
  */
 public class Watcher {
+
+    static {
+        System.loadLibrary("RemoteControl");
+    }
+
     //	public static final String PACKAGE = "cn.vtion.remotecontrol.tvserver.vstoresubclient/";
 //	public String mMonitoredService = "cn.vtion.remotecontrol.tvserver.vstoresubclient.sercice.RemoteControlService";
     private volatile boolean bHeartBreak = false;
