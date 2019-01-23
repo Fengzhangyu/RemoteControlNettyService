@@ -50,7 +50,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
     public static boolean isConnected = false;    //记录tv是否有设备连接
 
-//    public Watcher watcher;
+    public Watcher watcher;
 
     private Handler handler;
 
@@ -83,13 +83,12 @@ public class RemoteControlService extends Service implements PropertyChangeListe
             }
             /** 初始化DMS service */
 //            initUpnp();
+        } else if (Const.UPDATE_INJECT_MODEL_ACTION.equals(action)) {
+            if (eventSendController != null) {
+                int model = intent.getIntExtra(EventSendController.KEY_INJECT_MODEL, EventSendController.ADB_MODEL);//ADB_MODEL 20150908修改为PLUGIN_MODEL
+                eventSendController.setInjectModel(model);
+            }
         }
-//        else if (Const.UPDATE_INJECT_MODEL_ACTION.equals(action)) {
-//            if (eventSendController != null) {
-//                int model = intent.getIntExtra(EventSendController.KEY_INJECT_MODEL, EventSendController.ADB_MODEL);//ADB_MODEL 20150908修改为PLUGIN_MODEL
-//                eventSendController.setInjectModel(model);
-//            }
-//        }
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -119,7 +118,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
         audio = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
 
-//        watcher = new Watcher(this);
+        watcher = new Watcher(this);
         String uid = "";
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         ApplicationInfo appinfo = getApplicationInfo();
@@ -132,7 +131,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
             }
         }
         MLog.e("UID>>>>   " + uid);
-//        watcher.createAppMonitor(uid);
+        watcher.createAppMonitor(uid);
     }
 
 
@@ -159,7 +158,27 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
                     Log.i(TAG, "Server==received: " + (String) msg);
 
-                    eventSendController.sendEvent((String) msg);
+                    String reqStr = (String) msg;
+                    if (!reqStr.equals("Heartbeat")) {
+                        reqStr = reqStr.replace("\n", "");
+                        eventSendController.sendEvent(reqStr);
+                    }
+
+//                    if (!"Heart break".equals(reqStr)) {
+//                        if (reqStr.startsWith("vtionVolume")) {
+//                            audio.setStreamVolume(
+//                                    AudioManager.STREAM_MUSIC,
+//                                    Integer.parseInt(reqStr
+//                                            .split("vtionVolume")[1]),
+//                                    AudioManager.FLAG_PLAY_SOUND
+//                                            | AudioManager.FLAG_SHOW_UI);
+//                        } else if (reqStr.startsWith("vtionInput")) {
+//                            eventSendController.sendInputText(reqStr
+//                                    .split("vtionInput")[1]);
+//                        } else {
+//                            eventSendController.sendEvent(reqStr);
+//                        }
+//                    }
 
 //                    Toast.makeText(RemoteControlService.this, String.valueOf(msg), Toast.LENGTH_SHORT).show();
 

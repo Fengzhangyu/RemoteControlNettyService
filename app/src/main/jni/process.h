@@ -402,6 +402,7 @@ void Child::restart_parent() {
 
 void* Child::parent_monitor() {
 	handle_parent_die();
+	return NULL;
 }
 
 void Child::start_parent_monitor() {

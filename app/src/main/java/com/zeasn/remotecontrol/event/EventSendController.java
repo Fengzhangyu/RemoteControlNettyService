@@ -8,9 +8,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
 
+import com.zeasn.remotecontrol.receiver.StaticInstallReceiver;
 import com.zeasn.remotecontrol.utils.KeyValue;
 import com.zeasn.remotecontrol.utils.MLog;
 import com.zeasn.remotecontrol.utils.MethodUtils;
+import com.zeasn.remotecontrol.utils.StorageUtil;
 import com.zeasn.remotecontrol.utils.WindowUtils;
 
 import java.io.IOException;
@@ -47,6 +49,7 @@ public class EventSendController {
      * 模拟按键调用模式 (默认为adb事件发送模式)
      */
     public int INJECT_MODEL = PLUGIN_MODEL;//如果方式改变要更改事件发送模式 插件模式
+//    public int INJECT_MODEL = JNI_MODEL;//如果方式改变要更改事件发送模式 插件模式
 
     public static final String KEY_INJECT_MODEL = "INJECT_MODEL";
 
@@ -71,14 +74,14 @@ public class EventSendController {
             INJECT_MODEL = PRIMARY_MODEL;
             return;
         }
-        //判断是否已安装插件
+////        判断是否已安装插件
 //		boolean isInstalled = StorageUtil.isPkgInstalled(mContext,
 //				StaticInstallReceiver.PLUGIN_PKG);
 //		if (isInstalled) {
 //			INJECT_MODEL = PLUGIN_MODEL;
 //			return;
 //		}
-        //判断是否可以使用插件
+////        判断是否可以使用插件
 //		boolean flag = MethodUtils.isPluginAvailable(mContext);
 //		if (flag) {
 //			showPlugin();

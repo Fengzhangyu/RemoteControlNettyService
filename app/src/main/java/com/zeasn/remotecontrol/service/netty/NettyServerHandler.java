@@ -32,20 +32,22 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<byte[]> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, byte[] bytes) throws Exception {
-        TlvBox tlvBox = TlvBox.parse(bytes, 0, bytes.length);
-
-        HashMap<Integer, byte[]> mObjects = tlvBox.getmObjects();
-
-        Iterator iterator_2 = mObjects.keySet().iterator();
-        while (iterator_2.hasNext()) {
-            Object key = iterator_2.next();
-            Log.d("NettyService_Test:", new String(mObjects.get(key)));
-//            mListener.onMessageResponse(new String(mObjects.get(key)));
-            mListener.onMessageResponse("1");
-        }
+//        TlvBox tlvBox = TlvBox.parse(bytes, 0, bytes.length);
+//
+//        HashMap<Integer, byte[]> mObjects = tlvBox.getmObjects();
+//
+//        Iterator iterator_2 = mObjects.keySet().iterator();
+//        while (iterator_2.hasNext()) {
+//            Object key = iterator_2.next();
+//            Log.d("NettyService_Test:", new String(mObjects.get(key)));
+////            mListener.onMessageResponse(new String(mObjects.get(key)));
+//            mListener.onMessageResponse("1");
+//        }
 
 //        String s = tlvBox.getStringValue(13);
-//        mListener.onMessageResponse(s);
+        String s = new String(bytes);
+        Log.d("NettyService_Test:", s);
+        mListener.onMessageResponse(s);
     }
 
 

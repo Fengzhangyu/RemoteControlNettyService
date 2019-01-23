@@ -32,8 +32,8 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
         android:persistent="true"
+        android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <!--设置Persistent-->
         <activity android:name="com.zeasn.remotecontrol.MainActivity">
@@ -49,9 +49,20 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="com.zeasn.remotecontrol.START_REMOTE_CONTROL_SERVICE" />
-                <action android:name="cn.vtion.remotecontrol.tvserver.vstoresubclient.service.UPDATE_INJECT_MODEL_ACTION" />
+                <action android:name="com.zeasn.remotecontrol.service.UPDATE_INJECT_MODEL_ACTION" />
             </intent-filter>
         </service>
+        <receiver
+            android:name=".receiver.StaticInstallReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

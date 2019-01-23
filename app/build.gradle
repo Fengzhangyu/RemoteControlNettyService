@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 22
 //    buildToolsVersion '27.0.3'
+//    useLibrary 'org.apache.http.legacy'
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
@@ -32,39 +33,23 @@ android {
     sourceSets.main {
         jni.srcDirs = []
     }
-//    jniLibs.srcDirs = ['src/main/jniLibs']//设置目标的so存放路径
-//    externalNativeBuild {
-//        ndkBuild {
-//            path 'src/main/jni/Android.mk'
-//        }
-//    }
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/jni/Android.mk'
+        }
+    }
+    sourceSets {
+        main {
+            aidl.srcDirs = ['src/main/aidl', 'src/main/aidl/2', 'src/main/aidl/com.vtion.tv.remotecontrolplugin', 'src/com.vtion.tv.remotecontrolplugin', 'src/aidl/com.vtion.tv.remotecontrolplugin']
+        }
+    }
 }
-
 
 dependencies {
-    //    compile 'com.android.support:support-v4:18.0.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:22.+'
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation files('libs/org.eclipse.jetty.server_8.1.8.v20121106.jar')
-    implementation files('libs/javax.servlet-3.0.0.v201112011016.jar')
-    implementation files('libs/org.eclipse.jetty.client_8.1.8.v20121106.jar')
-    implementation files('libs/org.eclipse.jetty.continuation_8.1.8.v20121106.jar')
-    implementation files('libs/org.eclipse.jetty.http_8.1.8.v20121106.jar')
-    implementation files('libs/org.eclipse.jetty.io_8.1.8.v20121106.jar')
-    implementation files('libs/org.eclipse.jetty.security_8.1.8.v20121106.jar')
-    implementation files('libs/org.eclipse.jetty.servlet_8.1.8.v20121106.jar')
-    implementation files('libs/org.eclipse.jetty.servlet_8.1.8.v20121106.jar')
-    implementation files('libs/org.eclipse.jetty.util_8.1.8.v20121106.jar')
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation files('libs/netty-all-4.1.23.Final.jar')
 }
-//
-//dependencies {
-//    implementation fileTree(include: ['*.jar'], dir: 'libs')
-//    implementation 'com.android.support:appcompat-v7:22.+'
-////    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-////    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-//    testImplementation 'junit:junit:4.12'
-//    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-//    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-//    implementation files('libs/netty-all-4.1.23.Final.jar')
-//}
