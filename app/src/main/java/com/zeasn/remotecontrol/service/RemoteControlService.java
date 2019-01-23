@@ -1,6 +1,7 @@
 package com.zeasn.remotecontrol.service;
 
 import android.app.ActivityManager;
+import android.app.Instrumentation;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
@@ -53,6 +54,8 @@ public class RemoteControlService extends Service implements PropertyChangeListe
     public Watcher watcher;
 
     private Handler handler;
+
+    private Instrumentation instrumentation;
 
     @Override
     public void onCreate() {
@@ -115,6 +118,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
      */
     public void init() {
         eventSendController = new EventSendController(getApplicationContext());
+        instrumentation = new Instrumentation();
 
         audio = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
 
@@ -161,7 +165,10 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                     String reqStr = (String) msg;
                     if (!reqStr.equals("Heartbeat")) {
                         reqStr = reqStr.replace("\n", "");
-                        eventSendController.sendEvent(reqStr);
+//                        eventSendController.sendEvent(reqStr);
+
+                        //不需要插件直接条用本地adb
+                        instrumentation.sendKeyDownUpSync(Integer.parseInt(reqStr));
                     }
 
 //                    if (!"Heart break".equals(reqStr)) {
