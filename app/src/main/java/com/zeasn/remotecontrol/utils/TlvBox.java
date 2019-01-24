@@ -163,6 +163,14 @@ public class TlvBox {
         return TlvBox.parse(bytes, 0, bytes.length);
     }
 
+    public static TlvBox getObjectValue(HashMap<Integer, byte[]> mObjects1, Object type) {
+        byte[] bytes = mObjects1.get(type);
+        if (bytes == null) {
+            return null;
+        }
+        return TlvBox.parse(bytes, 0, bytes.length);
+    }
+
     public String getStringValue(int type) {
         byte[] bytes = mObjects.get(type);
         if (bytes == null) {

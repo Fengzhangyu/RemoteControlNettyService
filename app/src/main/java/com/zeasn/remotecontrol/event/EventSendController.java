@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
+import android.widget.Toast;
 
 import com.zeasn.remotecontrol.receiver.StaticInstallReceiver;
 import com.zeasn.remotecontrol.utils.KeyValue;
@@ -68,28 +69,30 @@ public class EventSendController {
      * 初始化选择按键模式
      */
     public void initEventModel() {
+
         //判断签名是否为系统签名
         boolean priFlag = MethodUtils.isPrimarySigAvailable(mContext);
         if (priFlag) {
             INJECT_MODEL = PRIMARY_MODEL;
             return;
         }
-////        判断是否已安装插件
-//		boolean isInstalled = StorageUtil.isPkgInstalled(mContext,
-//				StaticInstallReceiver.PLUGIN_PKG);
-//		if (isInstalled) {
-//			INJECT_MODEL = PLUGIN_MODEL;
-//			return;
-//		}
-////        判断是否可以使用插件
-//		boolean flag = MethodUtils.isPluginAvailable(mContext);
-//		if (flag) {
-//			showPlugin();
-//		}
 
-        // else {
-        // Toast.makeText(mContext, "无法安装插件", Toast.LENGTH_LONG).show();
-        // }
+//        判断是否已安装插件
+        boolean isInstalled = StorageUtil.isPkgInstalled(mContext,
+                StaticInstallReceiver.PLUGIN_PKG);
+        if (isInstalled) {
+            INJECT_MODEL = PLUGIN_MODEL;
+            return;
+        }
+
+//        判断是否可以使用插件
+		boolean flag = MethodUtils.isPluginAvailable(mContext);
+		if (flag) {
+			showPlugin();
+		}
+         else {
+         Toast.makeText(mContext, "无法安装插件", Toast.LENGTH_LONG).show();
+         }
 
     }
 

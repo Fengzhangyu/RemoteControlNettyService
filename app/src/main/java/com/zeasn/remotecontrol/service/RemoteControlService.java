@@ -55,8 +55,6 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
     private Handler handler;
 
-    private Instrumentation instrumentation;
-
     @Override
     public void onCreate() {
         MLog.d("onStartCommand，onCreate");
@@ -118,7 +116,6 @@ public class RemoteControlService extends Service implements PropertyChangeListe
      */
     public void init() {
         eventSendController = new EventSendController(getApplicationContext());
-        instrumentation = new Instrumentation();
 
         audio = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
 
@@ -165,10 +162,10 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                     String reqStr = (String) msg;
                     if (!reqStr.equals("Heartbeat")) {
                         reqStr = reqStr.replace("\n", "");
-//                        eventSendController.sendEvent(reqStr);
+                        eventSendController.sendEvent(reqStr);
 
                         //不需要插件直接条用本地adb
-                        instrumentation.sendKeyDownUpSync(Integer.parseInt(reqStr));
+//                        instrumentation.sendKeyDownUpSync(Integer.parseInt(reqStr));
                     }
 
 //                    if (!"Heart break".equals(reqStr)) {

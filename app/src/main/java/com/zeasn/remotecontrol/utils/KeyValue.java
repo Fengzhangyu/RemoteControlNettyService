@@ -29,6 +29,16 @@ public class KeyValue implements Parcelable {
 	public static final int KEYCODE_HOME = 0xb;
 	/**键盘输入*/
 	public static final int KEYCODE_KEYBOARD_INPUT = 0xc;
+	/**心跳标识*/
+	public static final int KEYVALUE_PLAY_HEARTBEAT = 13;
+	/**一件播放根标识*/
+	public static final int KEYVALUE_PLAY_ROOT = 14;
+	/**一件播放_播放ID*/
+	public static final int KEYVALUE_PLAY_ID = 15;
+	/**一件播放_播放url*/
+	public static final int KEYVALUE_PLAY_URL = 16;
+	/**滑动的最后音量*/
+	public static final int KEYVALUE_PLAY_VOLUME_STEP = 17;
 
 	public KeyValue(Parcel in) {
 		
