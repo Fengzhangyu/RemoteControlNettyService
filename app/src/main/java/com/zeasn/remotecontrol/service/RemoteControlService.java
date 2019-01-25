@@ -15,9 +15,15 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.zeasn.remotecontrol.CustomApplication;
 import com.zeasn.remotecontrol.event.EventSendController;
 import com.zeasn.remotecontrol.interfaces.NettyListener;
+import com.zeasn.remotecontrol.nsdhelper.NsdHelper;
+import com.zeasn.remotecontrol.nsdhelper.NsdListener;
+import com.zeasn.remotecontrol.nsdhelper.NsdService;
+import com.zeasn.remotecontrol.nsdhelper.NsdType;
 import com.zeasn.remotecontrol.service.netty.NSDServer;
 import com.zeasn.remotecontrol.service.netty.NettyHelper;
 import com.zeasn.remotecontrol.utils.Const;
@@ -64,7 +70,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
         init();
         /** 将service变为前台服务，防止被轻易杀掉(360,猎豹有效)*/
         startForeground(1, new Notification());
-        registerNsdServer();
+//        registerNsdServer();
         initNetty();
         super.onCreate();
     }
@@ -148,7 +154,6 @@ public class RemoteControlService extends Service implements PropertyChangeListe
         }
 
     }
-
 
     public class NettyThread extends Thread {
         @Override
@@ -248,17 +253,18 @@ public class RemoteControlService extends Service implements PropertyChangeListe
     /**
      * 服务器端注册一个可供NSD探测到的网络 Ip 地址，便于给展示叫号机连接此socket
      */
-    Runnable nsdServerRunnable = new Runnable() {
+    static Runnable nsdServerRunnable = new Runnable() {
         @Override
         public void run() {
 
             NSDServer nsdServer = new NSDServer();
-            nsdServer.startNSDServer(RemoteControlService.this, NSD_SERVER_NAME, PORT);
+            nsdServer.startNSDServer(CustomApplication.getContext(), NSD_SERVER_NAME, PORT);
 
             nsdServer.setRegisterState(new NSDServer.IRegisterState() {
                 @Override
                 public void onServiceRegistered(NsdServiceInfo serviceInfo) {
                     Log.i(TAG, "已注册服务onServiceRegistered: " + serviceInfo.toString());
+                    Toast.makeText(CustomApplication.getContext(), "已注册服务onServiceRegistered: " + serviceInfo.toString(), Toast.LENGTH_SHORT).show();
                     //已经注册可停止该服务
 //                    nsdServer.stopNSDServer();
                 }
@@ -281,7 +287,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
         }
     };
 
-    private void registerNsdServer() {
+    public static void registerNsdServer() {
 
         new Thread(nsdServerRunnable).start();
     }
@@ -316,4 +322,5 @@ public class RemoteControlService extends Service implements PropertyChangeListe
             }
         }
     }
+
 }

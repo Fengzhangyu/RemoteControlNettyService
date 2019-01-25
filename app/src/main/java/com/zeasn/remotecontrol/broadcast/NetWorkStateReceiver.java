@@ -9,9 +9,16 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.zeasn.remotecontrol.nsdhelper.NsdHelper;
+import com.zeasn.remotecontrol.nsdhelper.NsdListener;
+import com.zeasn.remotecontrol.nsdhelper.NsdService;
+import com.zeasn.remotecontrol.nsdhelper.NsdType;
+import com.zeasn.remotecontrol.service.RemoteControlService;
 import com.zeasn.remotecontrol.service.netty.NettyHelper;
 import com.zeasn.remotecontrol.utils.Const;
 import com.zeasn.remotecontrol.utils.MLog;
+
+import java.beans.PropertyChangeListener;
 
 import static com.zeasn.remotecontrol.CustomApplication.isNetWorkConnect;
 
@@ -19,17 +26,13 @@ import static com.zeasn.remotecontrol.CustomApplication.isNetWorkConnect;
  * 监听网络变化
  */
 
-public class NetWorkStateReceiver extends BroadcastReceiver {
+public class NetWorkStateReceiver extends BroadcastReceiver implements NsdListener {
 
     public static final String TAG = NetWorkStateReceiver.class.getSimpleName();
 
     Context mContext;
 
-    private static long WIFI_TIME = 0;
-    private static long ETHERNET_TIME = 0;
-    private static long NONE_TIME = 0;
-
-    private static int LAST_TYPE = -3;
+    private NsdHelper nsdHelper;
 
 
     @Override
@@ -41,6 +44,9 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
             ConnectivityManager manager = (ConnectivityManager) mContext.getSystemService(
                     Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+            if (nsdHelper == null) {
+                nsdHelper = new NsdHelper(context, this);
+            }
             if (networkInfo != null && networkInfo.isAvailable()) {
                 if (!isNetWorkConnect) {
                     isNetWorkConnect = true;
@@ -73,6 +79,8 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
                 if (isFastDoubleClick()) {
                     return;
                 }
+                nsdHelper.stopDiscovery();
+                nsdHelper.unregisterService();
                 NettyHelper.getInstance().disconnect();
                 MLog.v(TAG, "无网络");
                 Toast.makeText(context, "无网络", Toast.LENGTH_SHORT).show();
@@ -110,12 +118,46 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
      * 开启Socket 服务需要开启一个线程处理，等待客户端连接
      */
     private void initNetty(Context context) {
-
+        nsdHelper.stopDiscovery();
+        nsdHelper.unregisterService();
         Intent intent = new Intent();//context, RemoteControlService.class
         intent.setAction(Const.START_REMOTE_CONTROL_ACTION);
         intent.setPackage(context.getPackageName());
         context.startService(intent);
 
+        nsdHelper.setLogEnabled(true);
+        nsdHelper.registerService("Zeasn", NsdType.HTTP);
+        nsdHelper.startDiscovery(NsdType.HTTP);
+
     }
 
+    @Override
+    public void onNsdRegistered(NsdService registeredService) {
+
+    }
+
+    @Override
+    public void onNsdDiscoveryFinished() {
+
+    }
+
+    @Override
+    public void onNsdServiceFound(NsdService foundService) {
+
+    }
+
+    @Override
+    public void onNsdServiceResolved(NsdService resolvedService) {
+
+    }
+
+    @Override
+    public void onNsdServiceLost(NsdService lostService) {
+
+    }
+
+    @Override
+    public void onNsdError(String errorMessage, int errorCode, String errorSource) {
+
+    }
 }

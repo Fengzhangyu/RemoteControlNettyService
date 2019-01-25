@@ -35,7 +35,7 @@ public class BootCompletedReceiver extends BroadcastReceiver {
             // Pre-O behavior.
             context.startService(intentRemo);
 
-            registerNetWorkReceiver(context);
+//            registerNetWorkReceiver(context);
         }
     }
 
