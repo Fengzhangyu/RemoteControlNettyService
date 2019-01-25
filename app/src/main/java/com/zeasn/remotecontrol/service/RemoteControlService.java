@@ -15,18 +15,20 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.zeasn.remotecontrol.MainActivity;
 import com.zeasn.remotecontrol.event.EventSendController;
 import com.zeasn.remotecontrol.interfaces.NettyListener;
 import com.zeasn.remotecontrol.service.netty.NSDServer;
 import com.zeasn.remotecontrol.service.netty.NettyHelper;
 import com.zeasn.remotecontrol.utils.Const;
+import com.zeasn.remotecontrol.utils.KeyValue;
 import com.zeasn.remotecontrol.utils.MLog;
+import com.zeasn.remotecontrol.utils.TlvBox;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import io.netty.channel.Channel;
@@ -148,7 +150,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
     }
 
 
-    class NettyThread extends Thread {
+    public class NettyThread extends Thread {
         @Override
         public void run() {
             super.run();
@@ -157,16 +159,11 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                 @Override
                 public void onMessageResponse(Object msg) {
 
-                    Log.i(TAG, "Server==received: " + (String) msg);
+                    dataHandle((byte[]) msg);
 
-                    String reqStr = (String) msg;
-                    if (!reqStr.equals("Heartbeat")) {
-                        reqStr = reqStr.replace("\n", "");
-                        eventSendController.sendEvent(reqStr);
-
-                        //不需要插件直接条用本地adb
+                    //不需要插件直接条用本地adb
 //                        instrumentation.sendKeyDownUpSync(Integer.parseInt(reqStr));
-                    }
+//                }
 
 //                    if (!"Heart break".equals(reqStr)) {
 //                        if (reqStr.startsWith("vtionVolume")) {
@@ -240,8 +237,11 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                 }
             });
             //入口 开启Netty Server
-            NettyHelper.getInstance().start();
+            NettyHelper.getInstance().
+
+                    start();
         }
+
     }
 
 
@@ -286,4 +286,34 @@ public class RemoteControlService extends Service implements PropertyChangeListe
         new Thread(nsdServerRunnable).start();
     }
 
+    public void dataHandle(byte[] bytes) {
+
+        String reqStr = null;
+        TlvBox tlvBox = TlvBox.parse(bytes, 0, bytes.length);
+
+        HashMap<Integer, byte[]> mObjects = tlvBox.getmObjects();
+
+        Iterator iterator = mObjects.keySet().iterator();
+        if (iterator.hasNext()) {
+            Object key = iterator.next();
+            Log.d("NettyService_key:", key + "");
+            Log.d("NettyService_value:", new String(mObjects.get(key)));
+            reqStr = key + "";
+            if (Integer.parseInt(reqStr) < KeyValue.KEYVALUE_PLAY_HEARTBEAT) {
+                eventSendController.sendEvent(reqStr);
+            } else if (Integer.parseInt(reqStr) > KeyValue.KEYVALUE_PLAY_HEARTBEAT) {
+                TlvBox tlvBox1 = TlvBox.getObjectValue(mObjects, key);
+                HashMap<Integer, byte[]> mObjects1 = tlvBox1.getmObjects();
+                Iterator iterator1 = mObjects1.keySet().iterator();
+                while (iterator1.hasNext()) {
+                    Object key1 = iterator1.next();
+                    byte[] bytes2 = mObjects1.get(key1);
+                    Log.d("NettyService_value222:", new String(bytes2));
+                }
+            } else {
+                //Heartbeat
+                Log.d("NettyService:", new String(mObjects.get(key)));
+            }
+        }
+    }
 }

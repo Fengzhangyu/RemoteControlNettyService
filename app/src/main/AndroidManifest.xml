@@ -30,6 +30,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
+        android:name=".CustomApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -53,6 +54,7 @@
                 <action android:name="com.zeasn.remotecontrol.service.UPDATE_INJECT_MODEL_ACTION" />
             </intent-filter>
         </service>
+
         <receiver
             android:name=".receiver.StaticInstallReceiver"
             android:exported="false">
@@ -64,6 +66,20 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".receiver.BootCompletedReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <!--<receiver android:name=".broadcast.NetWorkStateReceiver">-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.net.wifi.WIFI_STATE_CHANGED" />-->
+        <!--<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />-->
+        <!--<action android:name="android.net.wifi.RSSI_CHANGED" />-->
+        <!--</intent-filter>-->
+        <!--</receiver>-->
 
     </application>
 

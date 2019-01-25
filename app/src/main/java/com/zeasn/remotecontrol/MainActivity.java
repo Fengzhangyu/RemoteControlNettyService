@@ -2,14 +2,20 @@ package com.zeasn.remotecontrol;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.zeasn.remotecontrol.broadcast.NetWorkStateReceiver;
 import com.zeasn.remotecontrol.event.EventSendController;
 import com.zeasn.remotecontrol.utils.Const;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    NetWorkStateReceiver mNetworkStateReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +32,22 @@ public class MainActivity extends AppCompatActivity {
         // Pre-O behavior.
         startService(intent);
 
+        registerNetWorkReceiver();
+
+
     }
 
+    public void registerNetWorkReceiver() {
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        filter.addAction(WifiManager.RSSI_CHANGED_ACTION);
+        mNetworkStateReceiver = new NetWorkStateReceiver();
+        registerReceiver(mNetworkStateReceiver, filter);
+    }
 
     /**
      * 更改遥控方式
+     *
      * @param context
      * @param model
      */
