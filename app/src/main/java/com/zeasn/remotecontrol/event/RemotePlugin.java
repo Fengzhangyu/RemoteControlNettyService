@@ -10,7 +10,9 @@ import android.os.RemoteException;
 import com.vtion.tv.remotecontrolplugin.mInterface;
 import com.zeasn.remotecontrol.utils.MLog;
 
-/**模拟按键插件控制类*/
+/**
+ * 模拟按键插件控制类
+ */
 public class RemotePlugin extends BaseEvent {
 
     private final String PLUGIN_ACTION = "com.vtion.tv.remotecontrolplugin";
@@ -27,6 +29,7 @@ public class RemotePlugin extends BaseEvent {
 
     private void init() {
         Intent intent = new Intent(PLUGIN_ACTION);
+        intent.setPackage(mContext.getPackageName());
         mContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -52,12 +55,13 @@ public class RemotePlugin extends BaseEvent {
 
     /**
      * 发送按键事件
+     *
      * @param keyValue
      * @throws RemoteException
      */
     public void sendKeyEvent(int keyValue) {
         try {
-            if(flag)
+            if (flag)
                 mService.sendKeyEvent(keyValue);
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -66,11 +70,12 @@ public class RemotePlugin extends BaseEvent {
 
     /**
      * 发送显示文本
+     *
      * @param content
      */
     public void sendString(String content) {
         try {
-            if(flag)
+            if (flag)
                 mService.sendString(content);
         } catch (RemoteException e) {
             e.printStackTrace();

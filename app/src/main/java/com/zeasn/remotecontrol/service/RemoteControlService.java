@@ -30,6 +30,7 @@ import com.zeasn.remotecontrol.utils.Const;
 import com.zeasn.remotecontrol.utils.KeyValue;
 import com.zeasn.remotecontrol.utils.MLog;
 import com.zeasn.remotecontrol.utils.TlvBox;
+import com.zeasn.remotecontrol.utils.WindowUtils;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -53,7 +54,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
     /**
      * 注册 NSD 服务的名称 和 端口 这个可以设置默认固定址，用于客户端通过 NSD_SERVER_NAME 筛选得到服务端地址和端口
      */
-    public static String NSD_SERVER_NAME = "Whale Tv - Netty";
+    public static String NSD_SERVER_NAME = "Whale Tv - " + WindowUtils.getMacDefault(null);
 
     public static final int PORT = 5051;
 
@@ -65,6 +66,9 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
     @Override
     public void onCreate() {
+
+        NSD_SERVER_NAME = "Whale Tv - " + WindowUtils.getMacDefault(this);
+
         MLog.d("onStartCommand，onCreate");
         handler = new Handler(Looper.getMainLooper());
         init();

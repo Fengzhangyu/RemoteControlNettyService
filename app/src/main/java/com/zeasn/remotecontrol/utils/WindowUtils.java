@@ -3,6 +3,9 @@ package com.zeasn.remotecontrol.utils;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,6 +19,8 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 
 import com.zeasn.remotecontrol.R;
+
+import java.util.Locale;
 
 
 /**
@@ -175,4 +180,37 @@ public class WindowUtils {
         return view;
 
     }
+
+    /**
+     * Android  6.0 之前（不包括6.0）
+     * 必须的权限  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+     * @param context
+     * @return
+     */
+    public static String getMacDefault(Context context) {
+        String mac = "02:00:00:00:00:00";
+        if (context == null) {
+            return mac;
+        }
+
+        WifiManager wifi = (WifiManager) context.getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
+        if (wifi == null) {
+            return mac;
+        }
+        WifiInfo info = null;
+        try {
+            info = wifi.getConnectionInfo();
+        } catch (Exception e) {
+        }
+        if (info == null) {
+            return null;
+        }
+        mac = info.getMacAddress();
+        if (!TextUtils.isEmpty(mac)) {
+            mac = mac.toUpperCase(Locale.ENGLISH);
+        }
+        return mac;
+    }
+
 }

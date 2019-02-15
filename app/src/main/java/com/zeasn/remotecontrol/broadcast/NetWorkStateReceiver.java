@@ -126,7 +126,7 @@ public class NetWorkStateReceiver extends BroadcastReceiver implements NsdListen
         context.startService(intent);
 
         nsdHelper.setLogEnabled(true);
-        nsdHelper.registerService("Zeasn", NsdType.HTTP);
+        nsdHelper.registerService(RemoteControlService.NSD_SERVER_NAME, NsdType.HTTP);
         nsdHelper.startDiscovery(NsdType.HTTP);
 
     }
