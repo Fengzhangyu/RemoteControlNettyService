@@ -12,6 +12,15 @@ import com.zeasn.remotecontrol.broadcast.NetWorkStateReceiver;
 import com.zeasn.remotecontrol.event.EventSendController;
 import com.zeasn.remotecontrol.utils.Const;
 
+import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
+
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceInfo;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         Intent intent = new Intent();//context, RemoteControlService.class
         intent.setAction(Const.START_REMOTE_CONTROL_ACTION);
@@ -59,4 +69,30 @@ public class MainActivity extends AppCompatActivity {
         context.startService(intent);
     }
 
+
+    /**
+     * 获取Ip地址
+     *
+     * @return
+     */
+
+    public static InetAddress getWifiInetAddress() {
+        InetAddress inetAddress = null;
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        return inetAddress;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return inetAddress;
+
+
+    }
 }

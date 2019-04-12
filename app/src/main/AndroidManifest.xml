@@ -73,6 +73,15 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".receiver.WhaleTvBroadcast"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.zeasn.whale.RemoteBroadcast" />
+            </intent-filter>
+        </receiver>
+
+
         <!--<receiver android:name=".broadcast.NetWorkStateReceiver">-->
         <!--<intent-filter>-->
         <!--<action android:name="android.net.wifi.WIFI_STATE_CHANGED" />-->

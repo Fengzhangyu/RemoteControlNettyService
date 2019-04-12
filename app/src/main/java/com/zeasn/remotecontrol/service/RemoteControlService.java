@@ -14,19 +14,18 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.zeasn.remotecontrol.CustomApplication;
+import com.zeasn.remotecontrol.MainActivity;
 import com.zeasn.remotecontrol.event.EventSendController;
 import com.zeasn.remotecontrol.interfaces.NettyListener;
-import com.zeasn.remotecontrol.nsdhelper.NsdHelper;
-import com.zeasn.remotecontrol.nsdhelper.NsdListener;
-import com.zeasn.remotecontrol.nsdhelper.NsdService;
-import com.zeasn.remotecontrol.nsdhelper.NsdType;
 import com.zeasn.remotecontrol.service.netty.NSDServer;
 import com.zeasn.remotecontrol.service.netty.NettyHelper;
 import com.zeasn.remotecontrol.utils.Const;
+import com.zeasn.remotecontrol.utils.KeyUtil;
 import com.zeasn.remotecontrol.utils.KeyValue;
 import com.zeasn.remotecontrol.utils.MLog;
 import com.zeasn.remotecontrol.utils.TlvBox;
@@ -39,6 +38,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 /**
  * Created by Devin.F on 2019/1/15.
@@ -46,6 +49,7 @@ import io.netty.channel.Channel;
 public class RemoteControlService extends Service implements PropertyChangeListener {
 
     private static final String TAG = "RemoteControlService";
+    private static final String BROADCAST_ACTION = "com.zeasn.remotecontrol";
 
     public AudioManager audio = null;
 
@@ -311,6 +315,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
             reqStr = key + "";
             if (Integer.parseInt(reqStr) < KeyValue.KEYVALUE_PLAY_HEARTBEAT) {
                 eventSendController.sendEvent(reqStr);
+                Log.d("NettyService_reqStr:", "==" + reqStr + "==");
             } else if (Integer.parseInt(reqStr) > KeyValue.KEYVALUE_PLAY_HEARTBEAT) {
                 TlvBox tlvBox1 = TlvBox.getObjectValue(mObjects, key);
                 HashMap<Integer, byte[]> mObjects1 = tlvBox1.getmObjects();
@@ -318,12 +323,48 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                 while (iterator1.hasNext()) {
                     Object key1 = iterator1.next();
                     byte[] bytes2 = mObjects1.get(key1);
-                    Log.d("NettyService_value222:", new String(bytes2));
+                    Log.d("NettyService_key1:", key1 + "=====");
+                    if (key1.toString().equals(KeyValue.KEYCODE_PLAY_DEEPLINK + "") || key1.toString().equals(KeyValue.KEYCODE_PLAY_APPSTART + "")) {
+                        Intent intent = new Intent();
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setAction(BROADCAST_ACTION);
+                        intent.putExtra("msgKey", key1 + "");
+                        intent.putExtra("msgValue", new String(bytes2));
+                        this.sendBroadcast(intent);
+                    }
+                    Log.d("NettyService_value222:", new String(bytes2) + "=====");
                 }
             } else {
                 //Heartbeat
                 Log.d("NettyService:", new String(mObjects.get(key)));
             }
+        }
+    }
+
+
+    /**
+     * 测试发送给客户端的消息
+     */
+    public static void sendMsgToClient(String receiveMsg) {
+        if (!NettyHelper.getInstance().getConnectStatus()) {
+            Toast.makeText(CustomApplication.getContext(), "未连接,请先连接", LENGTH_SHORT).show();
+        } else {
+            final String msg = "收到回复。。。";
+            if (TextUtils.isEmpty(msg.trim())) {
+                return;
+            }
+            NettyHelper.getInstance().sendMsgToServer(receiveMsg, new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                    if (channelFuture.isSuccess()) {
+                        Log.i(TAG, "Write auth successful");
+
+                    } else {
+                        Log.i(TAG, "Write auth error");
+                    }
+                }
+            });
+
         }
     }
 

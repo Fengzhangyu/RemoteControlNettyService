@@ -40,6 +40,11 @@ public class KeyValue implements Parcelable {
 	/**滑动的最后音量*/
 	public static final int KEYVALUE_PLAY_VOLUME_STEP = 17;
 
+	/**一键播放视频*/
+	public static final int KEYCODE_PLAY_DEEPLINK = 20;
+	/**一键打开应用*/
+	public static final int KEYCODE_PLAY_APPSTART = 21;
+
 	public KeyValue(Parcel in) {
 		
 	}
