@@ -18,7 +18,7 @@ public class WhaleTvBroadcast extends BroadcastReceiver {
         Log.d("zeasn_WhaleTvBroadcast", "=OPEN");
         if (action.equals("com.zeasn.whale.RemoteBroadcast")) {//msgError
             String msgError = intent.getStringExtra("msgError");
-            RemoteControlService.sendMsgToClient("Please sync the product id");
+            RemoteControlService.sendMsgToClient(msgError);
         }
     }
 
