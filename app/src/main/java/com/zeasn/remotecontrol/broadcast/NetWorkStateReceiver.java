@@ -52,7 +52,7 @@ public class NetWorkStateReceiver extends BroadcastReceiver implements NsdListen
                     isNetWorkConnect = true;
                     /**无网到有网处理**/
                     MLog.v(TAG, "无网到有网处理");
-                    Toast.makeText(context, "无网到有网处理", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "无网到有网处理", Toast.LENGTH_SHORT).show();
                 }
                 String type = networkInfo.getTypeName();
                 if (type.equalsIgnoreCase("ETHERNET") || type.equalsIgnoreCase("ETH")) {
@@ -60,7 +60,7 @@ public class NetWorkStateReceiver extends BroadcastReceiver implements NsdListen
                         return;
                     }
                     MLog.v(TAG, "连接到以太网");
-                    Toast.makeText(context, "连接到以太网", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "连接到以太网", Toast.LENGTH_SHORT).show();
                     initNetty(context);
 //                    isNetConnect = true;
 //                    if(isNetConnect) {
@@ -71,7 +71,7 @@ public class NetWorkStateReceiver extends BroadcastReceiver implements NsdListen
                         return;
                     }
                     MLog.v(TAG, "连接到WIFI");
-                    Toast.makeText(context, "连接到WIFI", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "连接到WIFI", Toast.LENGTH_SHORT).show();
                     initNetty(context);
                 }
             } else {
@@ -83,7 +83,7 @@ public class NetWorkStateReceiver extends BroadcastReceiver implements NsdListen
                 nsdHelper.unregisterService();
                 NettyHelper.getInstance().disconnect();
                 MLog.v(TAG, "无网络");
-                Toast.makeText(context, "无网络", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "无网络", Toast.LENGTH_SHORT).show();
             }
         } else if (WifiManager.RSSI_CHANGED_ACTION.equals(action)) {
             ConnectivityManager manager = (ConnectivityManager) mContext.getSystemService(
