@@ -18,8 +18,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceInfo;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -42,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         // Pre-O behavior.
         startService(intent);
 
-        registerNetWorkReceiver();
+//        registerNetWorkReceiver();
 
 
     }

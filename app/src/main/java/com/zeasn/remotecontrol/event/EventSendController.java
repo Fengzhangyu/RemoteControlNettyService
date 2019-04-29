@@ -61,8 +61,8 @@ public class EventSendController {
     public EventSendController(Context cxt) {
         mContext = cxt;
 
-        initEventModel();
-        initData();
+//        initEventModel();
+//        initData();
     }
 
     /**

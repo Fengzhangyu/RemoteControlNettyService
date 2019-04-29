@@ -4,6 +4,7 @@ import com.zeasn.remotecontrol.interfaces.NettyListener;
 import com.zeasn.remotecontrol.utils.MLog;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -28,7 +29,8 @@ import io.netty.util.CharsetUtil;
 public class NettyHelper {
 
     private static final String TAG = "NettyHelper";
-    private final int port = 5051;
+    private final int port = 23231;//Android 测试版本端口
+//    private final int port = 5051;
 
     private Channel channel;
 
@@ -58,6 +60,9 @@ public class NettyHelper {
         workerGroup = new NioEventLoopGroup();
 
         try {
+
+            SocketAddress  s = new InetSocketAddress(port);
+
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -73,14 +78,19 @@ public class NettyHelper {
                             //发送消息到客户端
                             ch.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8));
                             ch.pipeline().addLast(new ByteArrayDecoder());
-                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
+                            ch.pipeline().addLast(new LineBasedFrameDecoder(1048576*20));
                             ch.pipeline().addLast(new NettyServerHandler(listener));
                         }
                     });
 
+            //设置缓存区大小20M
+//            bootstrap.childOption("child.receiveBufferSize", 1048576*20);
+
+
             // Bind and start to accept incoming connections.
             //调用connect发起异步连接操作，然后调用sync同步方法等待连接成功。
             ChannelFuture f = bootstrap.bind().sync(); // 8
+
 
             MLog.d(NettyHelper.class.getName() + " started and listen on " + f.channel().localAddress());
             isServerStart = true;
@@ -91,15 +101,17 @@ public class NettyHelper {
             //等待客户端链路关闭，当客户端连接关闭之后，客户端主函数退出，退出之前释放NIO线程组的资源
             f.channel().closeFuture().sync(); // 9
 
-        } catch (InterruptedException e) {
+//        } catch (InterruptedException e) {
+        } catch (Exception e) {
             MLog.d(e.getLocalizedMessage());
             e.printStackTrace();
-        } finally {
-            isServerStart = false;
-            listener.onStopServer();
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
         }
+//        finally {
+//            isServerStart = false;
+//            listener.onStopServer();
+//            workerGroup.shutdownGracefully();
+//            bossGroup.shutdownGracefully();
+//        }
     }
 
     public void disconnect() {

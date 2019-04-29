@@ -60,7 +60,8 @@ public class RemoteControlService extends Service implements PropertyChangeListe
      */
     public static String NSD_SERVER_NAME = "Whale Tv - " + WindowUtils.getMacDefault(CustomApplication.getContext());
 
-    public static final int PORT = 5051;
+    public static final int PORT = 105051;
+//    public static final int PORT = 5051;
 
     public static boolean isConnected = false;    //记录tv是否有设备连接
 
@@ -76,7 +77,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
         init();
         /** 将service变为前台服务，防止被轻易杀掉(360,猎豹有效)*/
         startForeground(1, new Notification());
-//        registerNsdServer();
+        registerNsdServer();
         initNetty();
         super.onCreate();
     }
@@ -100,8 +101,8 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 //            initUpnp();
         } else if (Const.UPDATE_INJECT_MODEL_ACTION.equals(action)) {
             if (eventSendController != null) {
-                int model = intent.getIntExtra(EventSendController.KEY_INJECT_MODEL, EventSendController.ADB_MODEL);//ADB_MODEL 20150908修改为PLUGIN_MODEL
-                eventSendController.setInjectModel(model);
+//                int model = intent.getIntExtra(EventSendController.KEY_INJECT_MODEL, EventSendController.ADB_MODEL);//ADB_MODEL 20150908修改为PLUGIN_MODEL
+//                eventSendController.setInjectModel(model);
             }
         }
 
@@ -129,7 +130,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
      * 初始化操作
      */
     public void init() {
-        eventSendController = new EventSendController(getApplicationContext());
+//        eventSendController = new EventSendController(getApplicationContext());
 
         audio = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
 
@@ -155,6 +156,8 @@ public class RemoteControlService extends Service implements PropertyChangeListe
      */
     private void initNetty() {
 
+
+        Log.i(TAG, "=======");
         if (!NettyHelper.getInstance().isServerStart()) {
             new NettyThread().start();
         }
@@ -169,6 +172,8 @@ public class RemoteControlService extends Service implements PropertyChangeListe
             NettyHelper.getInstance().setListener(new NettyListener() {
                 @Override
                 public void onMessageResponse(Object msg) {
+
+                    Log.d(TAG, "=============" + new String((byte[]) msg));
 
                     dataHandle((byte[]) msg);
 
@@ -270,7 +275,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                 @Override
                 public void onServiceRegistered(NsdServiceInfo serviceInfo) {
                     Log.i(TAG, "已注册服务onServiceRegistered: " + serviceInfo.toString());
-                    Toast.makeText(CustomApplication.getContext(), "已注册服务onServiceRegistered: " + serviceInfo.toString(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(CustomApplication.getContext(), "已注册服务onServiceRegistered: " + serviceInfo.toString(), Toast.LENGTH_SHORT).show();
                     //已经注册可停止该服务
 //                    nsdServer.stopNSDServer();
                 }
@@ -326,7 +331,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                         if (key1.toString().equals(KeyValue.KEYCODE_PLAY_APPSTART + "")) {
                             String[] appsOpen = new String(bytes2).split("&&");
                             if (appsOpen[3].equals("null")) {
-                                RemoteControlService.sendMsgToClient(appsOpen[3]);
+                                RemoteControlService.sendMsgToClient("10304");//应用打开失败
                                 return;
                             }
                         }
@@ -352,7 +357,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
      */
     public static void sendMsgToClient(String receiveMsg) {
         if (!NettyHelper.getInstance().getConnectStatus()) {
-            Toast.makeText(CustomApplication.getContext(), "未连接,请先连接", LENGTH_SHORT).show();
+//            Toast.makeText(CustomApplication.getContext(), "未连接,请先连接", LENGTH_SHORT).show();
         } else {
             final String msg = "收到回复。。。";
             if (TextUtils.isEmpty(msg.trim())) {
