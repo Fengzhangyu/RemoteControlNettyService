@@ -1,6 +1,7 @@
 package com.zeasn.remotecontrol.event;
 
 import android.app.Instrumentation;
+import android.util.Log;
 
 import com.zeasn.remotecontrol.utils.KeyUtil;
 
@@ -23,7 +24,9 @@ public class PrimarySigEvent extends BaseEvent {
 
 	@Override
 	public void sendKeyEvent(int event) {
+		Log.d("PrimarySigEvent==star", event + "");
 		int keyCode = KeyUtil.keyValueConvert(event);
+		Log.d("PrimarySigEvent==end", event + "");
 		instrumentation.sendKeyDownUpSync(keyCode);
 		
 	}

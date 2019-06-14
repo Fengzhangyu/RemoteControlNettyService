@@ -29,6 +29,8 @@ public class KeyValue implements Parcelable {
 	public static final int KEYCODE_HOME = 0xb;
 	/**键盘输入*/
 	public static final int KEYCODE_KEYBOARD_INPUT = 0xc;
+	/**静音*/
+	public static final int KEYCODE_MUTE = 12;
 	/**心跳标识*/
 	public static final int KEYVALUE_PLAY_HEARTBEAT = 13;
 	/**一件播放根标识*/

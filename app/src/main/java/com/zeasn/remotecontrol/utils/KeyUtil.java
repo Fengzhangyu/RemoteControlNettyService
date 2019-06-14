@@ -31,6 +31,8 @@ public class KeyUtil {
 			return KeyEvent.KEYCODE_HOME;
 		case KeyValue.KEYCODE_BACK:
 			return KeyEvent.KEYCODE_BACK;
+		case KeyValue.KEYCODE_MUTE:
+			return KeyEvent.KEYCODE_VOLUME_MUTE;
 		default:
 			if (MLog.DEBUG) {
 				MLog.e("wrongKey", "keyValue>>>>>  " + autoKey);

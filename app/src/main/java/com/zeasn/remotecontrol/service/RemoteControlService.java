@@ -36,6 +36,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -98,11 +99,10 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                 eventSendController.initEventModel();
             }
             /** 初始化DMS service */
-//            initUpnp();
         } else if (Const.UPDATE_INJECT_MODEL_ACTION.equals(action)) {
             if (eventSendController != null) {
-//                int model = intent.getIntExtra(EventSendController.KEY_INJECT_MODEL, EventSendController.ADB_MODEL);//ADB_MODEL 20150908修改为PLUGIN_MODEL
-//                eventSendController.setInjectModel(model);
+                int model = intent.getIntExtra(EventSendController.KEY_INJECT_MODEL, EventSendController.ADB_MODEL);//ADB_MODEL 20150908修改为PLUGIN_MODEL
+                eventSendController.setInjectModel(model);
             }
         }
 
@@ -130,9 +130,11 @@ public class RemoteControlService extends Service implements PropertyChangeListe
      * 初始化操作
      */
     public void init() {
-//        eventSendController = new EventSendController(getApplicationContext());
+        eventSendController = new EventSendController(getApplicationContext());
 
         audio = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
+
+//        currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
 
         watcher = new Watcher(this);
         String uid = "";
@@ -164,6 +166,18 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
     }
 
+    String vtionVolume = "vtionVolume";
+
+    String[] volumes = null;
+
+    String volume = null;
+
+
+    public boolean isNumeric(String str) {
+        Pattern pattern = Pattern.compile("[0-9]*");
+        return pattern.matcher(str).matches();
+    }
+
     public class NettyThread extends Thread {
         @Override
         public void run() {
@@ -175,7 +189,31 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
                     Log.d(TAG, "=============" + new String((byte[]) msg));
 
-                    dataHandle((byte[]) msg);
+                    byte[] bs = (byte[]) msg;
+
+                    if (new String(bs).contains(vtionVolume)) {
+
+                        volumes = new String(bs)
+                                .split(vtionVolume);
+
+                        volume = volumes[volumes.length - 1];
+                        Log.d(TAG, "vtionVolume======" + volume);
+
+                        if (isNumeric(volume)) {
+
+                            audio.setStreamVolume(
+                                    AudioManager.STREAM_MUSIC,
+                                    Integer.parseInt(volume),
+                                    AudioManager.FLAG_PLAY_SOUND
+                                            | AudioManager.FLAG_SHOW_UI);
+
+                        }
+
+                    } else {
+
+                        dataHandle((byte[]) msg);
+
+                    }
 
                     //不需要插件直接条用本地adb
 //                        instrumentation.sendKeyDownUpSync(Integer.parseInt(reqStr));
@@ -234,6 +272,9 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                 public void onServiceStatusConnectChanged(final int statusCode) {
 
                     Log.i(TAG, "Netty Server status:" + statusCode);
+
+                    sendMsgToClient(vtionVolume  + ":" + audio.getMode() + ":"+ audio.getStreamVolume(AudioManager.STREAM_MUSIC));
+
 //                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -260,6 +301,11 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
     }
 
+//是否静音
+    private boolean isSilentMode() {
+        return audio.getMode() != AudioManager.RINGER_MODE_SILENT;
+
+    }
 
     /**
      * 服务器端注册一个可供NSD探测到的网络 Ip 地址，便于给展示叫号机连接此socket
@@ -319,6 +365,14 @@ public class RemoteControlService extends Service implements PropertyChangeListe
             if (Integer.parseInt(reqStr) < KeyValue.KEYVALUE_PLAY_HEARTBEAT) {
                 eventSendController.sendEvent(reqStr);
                 Log.d("NettyService_reqStr:", "==" + reqStr + "==");
+            } else if (Integer.parseInt(reqStr) == KeyValue.KEYVALUE_PLAY_VOLUME_STEP) {
+                audio.setStreamVolume(
+                        AudioManager.STREAM_MUSIC,
+                        Integer.parseInt(new String(mObjects.get(key))
+                                .split("vtionVolume")[1]),
+                        AudioManager.FLAG_PLAY_SOUND
+                                | AudioManager.FLAG_SHOW_UI);
+                Log.d("NettyService_reqStr:", "==" + reqStr + "==");
             } else if (Integer.parseInt(reqStr) > KeyValue.KEYVALUE_PLAY_HEARTBEAT) {
                 TlvBox tlvBox1 = TlvBox.getObjectValue(mObjects, key);
                 HashMap<Integer, byte[]> mObjects1 = tlvBox1.getmObjects();
@@ -327,10 +381,12 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                     Object key1 = iterator1.next();
                     byte[] bytes2 = mObjects1.get(key1);
                     Log.d("NettyService_key1:", key1 + "=====");
+                    String str = new String(bytes2);
+                    Log.d("NettyService_key1:", str + "=====");
                     if (key1.toString().equals(KeyValue.KEYCODE_PLAY_DEEPLINK + "") || key1.toString().equals(KeyValue.KEYCODE_PLAY_APPSTART + "")) {
                         if (key1.toString().equals(KeyValue.KEYCODE_PLAY_APPSTART + "")) {
                             String[] appsOpen = new String(bytes2).split("&&");
-                            if (appsOpen[3].equals("null")) {
+                            if (TextUtils.isEmpty(appsOpen[2])) {
                                 RemoteControlService.sendMsgToClient("10304");//应用打开失败
                                 return;
                             }

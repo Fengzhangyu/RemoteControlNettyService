@@ -61,8 +61,8 @@ public class EventSendController {
     public EventSendController(Context cxt) {
         mContext = cxt;
 
-//        initEventModel();
-//        initData();
+        initEventModel();
+        initData();
     }
 
     /**
@@ -101,15 +101,15 @@ public class EventSendController {
      */
     private void initData() {
         audio = (AudioManager) mContext.getSystemService(Service.AUDIO_SERVICE);
-        if (INJECT_MODEL == ADB_MODEL) {
-            sendEvent = new AdbEvent();
-        } else if (INJECT_MODEL == PLUGIN_MODEL) {
-            sendEvent = new RemotePlugin(mContext);
-        } else if (INJECT_MODEL == JNI_MODEL) {
-            sendEvent = new EventInjector();
-        } else if (INJECT_MODEL == PRIMARY_MODEL) {
+//        if (INJECT_MODEL == ADB_MODEL) {
+//            sendEvent = new AdbEvent();
+//        } else if (INJECT_MODEL == PLUGIN_MODEL) {
+//            sendEvent = new RemotePlugin(mContext);
+//        } else if (INJECT_MODEL == JNI_MODEL) {
+//            sendEvent = new EventInjector();
+//        } else if (INJECT_MODEL == PRIMARY_MODEL) {
             sendEvent = new PrimarySigEvent();
-        }
+//        }
     }
 
     /**

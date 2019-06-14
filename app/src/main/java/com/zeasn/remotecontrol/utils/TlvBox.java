@@ -11,12 +11,16 @@ package com.zeasn.remotecontrol.utils;/*
  *  or (at your option) any later version.
  */
 
+import android.util.Log;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Set;
 
 public class TlvBox {
+
+    private static final String TAG = TlvBox.class.getName();
 
     private static final ByteOrder DEFAULT_BYTE_ORDER = ByteOrder.BIG_ENDIAN; //ByteOrder.LITTLE_ENDIAN;
 
@@ -30,17 +34,26 @@ public class TlvBox {
     public static TlvBox parse(byte[] buffer, int offset, int length) {
 
         TlvBox box = new TlvBox();
+        try {
+            int parsed = 0;
+            while (parsed < length) {
+                int type = ByteBuffer.wrap(buffer, offset + parsed, 4).order(DEFAULT_BYTE_ORDER).getInt();
+                parsed += 4;
+                int size = ByteBuffer.wrap(buffer, offset + parsed, 4).order(DEFAULT_BYTE_ORDER).getInt();
+                Log.d(TAG, "size  " + size );
+                Log.d(TAG, "buffer  " + new String(buffer));
+                parsed += 4;
 
-        int parsed = 0;
-        while (parsed < length) {
-            int type = ByteBuffer.wrap(buffer, offset + parsed, 4).order(DEFAULT_BYTE_ORDER).getInt();
-            parsed += 4;
-            int size = ByteBuffer.wrap(buffer, offset + parsed, 4).order(DEFAULT_BYTE_ORDER).getInt();
-            parsed += 4;
-            byte[] value = new byte[size];
-            System.arraycopy(buffer, offset + parsed, value, 0, size);
-            box.putBytesValue(type, value);
-            parsed += size;
+                int maxByte = size > 2048 ? 2048 : size;
+
+                byte[] value = new byte[maxByte];
+//                byte[] value = new byte[size];
+                System.arraycopy(buffer, offset + parsed, value, 0, size);
+                Log.d(TAG, "value  " + new String(value));
+                box.putBytesValue(type, value);
+                parsed += size;
+            }
+        } catch (Exception e) {
         }
         return box;
     }

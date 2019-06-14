@@ -15,8 +15,8 @@ android {
         applicationId "com.zeasn.remotecontrol"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 11000000
-        versionName "1.0.0"
+        versionCode 11000100
+        versionName "1.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
@@ -49,6 +49,12 @@ android {
     sourceSets {
         main {
             aidl.srcDirs = ['src/main/aidl', 'src/main/aidl/2', 'src/main/aidl/com.vtion.tv.remotecontrolplugin', 'src/com.vtion.tv.remotecontrolplugin', 'src/aidl/com.vtion.tv.remotecontrolplugin']
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "Remotecontrol-Service-${buildType.name}-${defaultConfig.versionName}.apk"
         }
     }
 }
