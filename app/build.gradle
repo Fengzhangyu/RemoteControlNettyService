@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 27
 //    buildToolsVersion '27.0.3'
 //    useLibrary 'org.apache.http.legacy'
     packagingOptions {
@@ -11,10 +11,13 @@ android {
         exclude 'META-INF/ECLIPSE_.SF'
         exclude 'META-INF/eclipse.inf'
     }
+
+    useLibrary 'org.apache.http.legacy'
+    
     defaultConfig {
         applicationId "com.zeasn.remotecontrol"
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 27
         versionCode 11000100
         versionName "1.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

@@ -7,17 +7,27 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.zeasn.remotecontrol.broadcast.NetWorkStateReceiver;
 import com.zeasn.remotecontrol.event.EventSendController;
+import com.zeasn.remotecontrol.httpservice.HttpServerlInitializer;
+import com.zeasn.remotecontrol.receiver.BootCompletedReceiver;
+import com.zeasn.remotecontrol.service.RemoteControlService;
 import com.zeasn.remotecontrol.utils.Const;
+import com.zeasn.remotecontrol.utils.ExPackageManager;
+import com.zeasn.remotecontrol.utils.LocalAppManager;
 
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -40,8 +50,52 @@ public class MainActivity extends AppCompatActivity {
         // Pre-O behavior.
         startService(intent);
 
+        BootCompletedReceiver.startHttpService();
+
 //        registerNetWorkReceiver();
 
+        findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+//                List<ExPackageManager.AppInfo> list = ExPackageManager.queryAppInfo(MainActivity.this, false);
+//
+//                Log.d("test", "test" + list.size());
+//                RemoteControlService.sendMsgToClient(ExPackageManager.getQueryAppInfoJsonString(MainActivity.this, false));
+
+
+                LocalAppManager.startNonPartyApplication(MainActivity.this, "com.netflix.mediaclient");
+
+
+//                //负责接收客户端连接
+//                EventLoopGroup boosGroup = new NioEventLoopGroup();
+//                //处理连接
+//                EventLoopGroup workerGroup = new NioEventLoopGroup();
+//
+//                try {
+//                    ServerBootstrap bootstrap = new ServerBootstrap();
+//
+//                    bootstrap.group(boosGroup, workerGroup)
+//                            .channel(NioServerSocketChannel.class)
+//                            .childHandler(new HttpServerlInitializer());
+//
+//                    //绑定端口号
+//                    ChannelFuture channelFuture = null;
+//                    try {
+//                        channelFuture = bootstrap.bind(9090).sync();
+//                        channelFuture.channel().closeFuture().sync();
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                } finally {
+//                    boosGroup.shutdownGracefully();
+//                    workerGroup.shutdownGracefully();
+//
+//                }
+
+            }
+        });
 
     }
 

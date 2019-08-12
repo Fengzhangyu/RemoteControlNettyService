@@ -218,7 +218,10 @@ public class EventSendController {
      * 显示安装插件弹窗
      */
     public void showPlugin() {
-        WindowUtils.showPopupWindow(mContext);
+        //test
+//        WindowUtils.showPopupWindow(mContext);
+
+
         /*
          * Builder builder = new AlertDialog.Builder(mContext);
          * builder.setTitle("Vtion遥控小助手");

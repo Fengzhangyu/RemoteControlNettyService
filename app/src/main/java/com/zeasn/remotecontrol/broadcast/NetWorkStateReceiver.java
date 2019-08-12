@@ -13,6 +13,7 @@ import com.zeasn.remotecontrol.nsdhelper.NsdHelper;
 import com.zeasn.remotecontrol.nsdhelper.NsdListener;
 import com.zeasn.remotecontrol.nsdhelper.NsdService;
 import com.zeasn.remotecontrol.nsdhelper.NsdType;
+import com.zeasn.remotecontrol.receiver.BootCompletedReceiver;
 import com.zeasn.remotecontrol.service.RemoteControlService;
 import com.zeasn.remotecontrol.service.netty.NettyHelper;
 import com.zeasn.remotecontrol.utils.Const;
@@ -124,6 +125,8 @@ public class NetWorkStateReceiver extends BroadcastReceiver implements NsdListen
         intent.setAction(Const.START_REMOTE_CONTROL_ACTION);
         intent.setPackage(context.getPackageName());
         context.startService(intent);
+
+        BootCompletedReceiver.startHttpService();
 
         nsdHelper.setLogEnabled(true);
         nsdHelper.registerService(RemoteControlService.NSD_SERVER_NAME, NsdType.HTTP);

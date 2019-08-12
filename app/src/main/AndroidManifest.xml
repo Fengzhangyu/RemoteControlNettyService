@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sharedUserId="android.uid.system"
-    package="com.zeasn.remotecontrol" >
+    package="com.zeasn.remotecontrol"
+    >
+
     <!--android:sharedUserId="android.uid.system"-->
 
     <supports-screens
@@ -29,6 +30,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
 
     <application
         android:name=".CustomApplication"

@@ -25,8 +25,10 @@ import com.zeasn.remotecontrol.interfaces.NettyListener;
 import com.zeasn.remotecontrol.service.netty.NSDServer;
 import com.zeasn.remotecontrol.service.netty.NettyHelper;
 import com.zeasn.remotecontrol.utils.Const;
+import com.zeasn.remotecontrol.utils.ExPackageManager;
 import com.zeasn.remotecontrol.utils.KeyUtil;
 import com.zeasn.remotecontrol.utils.KeyValue;
+import com.zeasn.remotecontrol.utils.LocalAppManager;
 import com.zeasn.remotecontrol.utils.MLog;
 import com.zeasn.remotecontrol.utils.TlvBox;
 import com.zeasn.remotecontrol.utils.WindowUtils;
@@ -80,6 +82,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
         startForeground(1, new Notification());
         registerNsdServer();
         initNetty();
+
         super.onCreate();
     }
 
@@ -205,7 +208,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                                     AudioManager.STREAM_MUSIC,
                                     Integer.parseInt(volume),
                                     AudioManager.FLAG_PLAY_SOUND
-                                            | AudioManager.FLAG_SHOW_UI);
+                                                | AudioManager.FLAG_SHOW_UI);
 
                         }
 
@@ -273,8 +276,20 @@ public class RemoteControlService extends Service implements PropertyChangeListe
 
                     Log.i(TAG, "Netty Server status:" + statusCode);
 
-                    sendMsgToClient(vtionVolume  + ":" + audio.getMode() + ":"+ audio.getStreamVolume(AudioManager.STREAM_MUSIC));
+//                    sendMsgToClient(vtionVolume  + ":" + audio.getMode() + ":"+ audio.getStreamVolume(AudioManager.STREAM_MUSIC));
+//                    Log.i(TAG, "Netty==:" + ExPackageManager.getQueryAppInfoJsonString(CustomApplication.getContext(), false));
+//                    sendMsgToClient("AppInfo:" + ExPackageManager.getQueryAppInfoJsonString(CustomApplication.getContext(), false));
 
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            sendMsgToClient(vtionVolume  + ":" + audio.getMode() + ":"+ audio.getStreamVolume(AudioManager.STREAM_MUSIC));
+                            Log.i(TAG, "Netty==:" + LocalAppManager.getQueryAppInfoJsonString(CustomApplication.getContext(), false));
+                            sendMsgToClient("AppInfo:" + LocalAppManager.getQueryAppInfoJsonString(CustomApplication.getContext(), false));
+
+                        }
+                    }).start();
 //                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -373,6 +388,10 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                         AudioManager.FLAG_PLAY_SOUND
                                 | AudioManager.FLAG_SHOW_UI);
                 Log.d("NettyService_reqStr:", "==" + reqStr + "==");
+            }  else if (Integer.parseInt(reqStr) == KeyValue.KEYCODE_APP_OPEN) {//打开应用
+                String appPkg = new String(mObjects.get(key));
+                LocalAppManager.startNonPartyApplication(CustomApplication.getContext(), appPkg);
+
             } else if (Integer.parseInt(reqStr) > KeyValue.KEYVALUE_PLAY_HEARTBEAT) {
                 TlvBox tlvBox1 = TlvBox.getObjectValue(mObjects, key);
                 HashMap<Integer, byte[]> mObjects1 = tlvBox1.getmObjects();
@@ -402,6 +421,7 @@ public class RemoteControlService extends Service implements PropertyChangeListe
                 }
             } else {
                 //Heartbeat
+
                 Log.d("NettyService:", new String(mObjects.get(key)));
             }
         }
@@ -412,6 +432,31 @@ public class RemoteControlService extends Service implements PropertyChangeListe
      * 测试发送给客户端的消息
      */
     public static void sendMsgToClient(String receiveMsg) {
+        if (!NettyHelper.getInstance().getConnectStatus()) {
+//            Toast.makeText(CustomApplication.getContext(), "未连接,请先连接", LENGTH_SHORT).show();
+        } else {
+            final String msg = "收到回复。。。";
+            if (TextUtils.isEmpty(msg.trim())) {
+                return;
+            }
+            NettyHelper.getInstance().sendMsgToServer(receiveMsg, new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                    if (channelFuture.isSuccess()) {
+                        Log.i(TAG, "Write auth successful");
+
+                    } else {
+                        Log.i(TAG, "Write auth error");
+                    }
+                }
+            });
+
+        }
+    }
+    /**
+     * 测试发送给客户端的消息
+     */
+    public static void sendMsgToClient(byte[] receiveMsg) {
         if (!NettyHelper.getInstance().getConnectStatus()) {
 //            Toast.makeText(CustomApplication.getContext(), "未连接,请先连接", LENGTH_SHORT).show();
         } else {

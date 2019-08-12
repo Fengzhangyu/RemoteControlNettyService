@@ -1,5 +1,7 @@
 package com.zeasn.remotecontrol.service.netty;
 
+import android.util.Log;
+
 import com.zeasn.remotecontrol.interfaces.NettyListener;
 import com.zeasn.remotecontrol.utils.MLog;
 
@@ -7,6 +9,8 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -141,7 +145,18 @@ public class NettyHelper {
 //			ByteBuf buf = Unpooled.copiedBuffer(data);
 //            ByteBuf byteBuf = Unpooled.copiedBuffer(data + System.getProperty("line.separator"), //2
 //                    CharsetUtil.UTF_8);
+            Log.d(TAG, data + System.getProperty("line.separator"));
             channel.writeAndFlush(data + System.getProperty("line.separator")).addListener(listener);
+        }
+        return flag;
+    }
+    public boolean sendMsgToServer(byte[] data, ChannelFutureListener listener) {
+        boolean flag = channel != null && connectStatus && channel.isActive();
+        if (flag) {
+			ByteBuf buf = Unpooled.copiedBuffer(data);
+            ByteBuf byteBuf = Unpooled.copiedBuffer(data + System.getProperty("line.separator"), //2
+                    CharsetUtil.UTF_8);
+            channel.writeAndFlush(buf).addListener(listener);
         }
         return flag;
     }

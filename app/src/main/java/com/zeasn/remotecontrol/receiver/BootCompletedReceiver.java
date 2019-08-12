@@ -8,7 +8,14 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 
 import com.zeasn.remotecontrol.broadcast.NetWorkStateReceiver;
+import com.zeasn.remotecontrol.httpservice.HttpServerlInitializer;
 import com.zeasn.remotecontrol.utils.Const;
+
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 
 /**
@@ -19,6 +26,12 @@ public class BootCompletedReceiver extends BroadcastReceiver {
     private static final String BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
 
     NetWorkStateReceiver mNetworkStateReceiver;
+
+    //负责接收客户端连接
+    private static EventLoopGroup boosGroup;
+    //处理连接
+    private static EventLoopGroup workerGroup;
+    private static ServerBootstrap bootstrap;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -37,8 +50,47 @@ public class BootCompletedReceiver extends BroadcastReceiver {
 
             registerNetWorkReceiver(context);
 
+            startHttpService();
+
 
         }
+    }
+
+    public static void startHttpService() {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    if(boosGroup == null)
+                        boosGroup = new NioEventLoopGroup();
+                    //处理连接
+                    if(workerGroup == null)
+                        workerGroup = new NioEventLoopGroup();
+                    if(bootstrap == null)
+                        bootstrap = new ServerBootstrap();
+
+                    bootstrap.group(boosGroup, workerGroup)
+                            .channel(NioServerSocketChannel.class)
+                            .childHandler(new HttpServerlInitializer());
+
+                    //绑定端口号
+                    ChannelFuture channelFuture = null;
+                    try {
+                        channelFuture = bootstrap.bind(9090).sync();
+                        channelFuture.channel().closeFuture().sync();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                } finally {
+                    boosGroup.shutdownGracefully();
+                    workerGroup.shutdownGracefully();
+
+                }
+            }
+        }).start();
     }
 
     public void registerNetWorkReceiver(Context context) {

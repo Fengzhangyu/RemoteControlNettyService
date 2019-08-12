@@ -46,6 +46,8 @@ public class KeyValue implements Parcelable {
 	public static final int KEYCODE_PLAY_DEEPLINK = 20;
 	/**一键打开应用*/
 	public static final int KEYCODE_PLAY_APPSTART = 21;
+	//应用打开
+	public static final int KEYCODE_APP_OPEN = 23;
 
 	public KeyValue(Parcel in) {
 		
